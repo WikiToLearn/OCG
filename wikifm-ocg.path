@@ -1,0 +1,148 @@
+diff --git a/lib/index.js b/lib/index.js
+index 28a4a6a..7127c6e 100644
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -87,6 +87,7 @@ var STD_HEADER = [
+ 	"\\pagestyle{headings}",
+ 	"\\usepackage{fontspec, xunicode, polyglossia, graphicx, xltxtra}",
+ 	"\\usepackage{amsmath,amsthm,amstext,amssymb}",
++	"\\usepackage{mathrsfs}",
+ 	// allow list nesting deeper than 4
+ 	// see: http://stackoverflow.com/questions/1935952/maximum-nesting-level-of-lists-in-latex
+ 	"\\usepackage{enumitem}\\setlistdepth{9}",
+@@ -145,6 +146,11 @@ var STD_HEADER = [
+ 	"{CharisSIL}",
+ */
+ 
++	// WikiFM numbering equation
++// 	"\\makeatletter",
++// 	"\\long\\def\\theequation{\\ifnum \\c@chapter > \\z@ \\thechapter .\\fi \\@arabic \\c@equation}",
++// 	"\\makeatother",
++
+ 	// Set the default font
+ 	"\\setmainfont[" + (SCRIPT_FONTS['default'].opts||'') + "]{" + SCRIPT_FONTS['default'].name + "}",
+ 	"\\newcommand{\\LTRfont}{}",
+@@ -160,7 +166,7 @@ var STD_HEADER = [
+ 		"\\footnotesize\\onecolumn" +
+ 	"}",
+ 	// fleqn makes equations flush left; also remove the indentation:
+-	"\\setlength{\\mathindent}{0pt}",
++// 	"\\setlength{\\mathindent}{0pt}",
+ 	// helper for single curly quote
+ 	"\\newcommand{\\poss}{\u2019}",
+ 
+@@ -175,18 +181,7 @@ var STD_FOOTER = [
+ // https://gist.github.com/gruber/249502
+ var URL_REGEXP = /\b((?:[a-z][\w\-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]|\((?:[^\s()<>]|(?:\([^\s()<>]+\)))*\))+(?:\((?:[^\s()<>]|(?:\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/i;
+ 
+-// Convert plain text (with HTML whitespace semantics) to an appropriately
+-// escaped string for TeX to process.
+-var texEscape = function(str, nourls) {
+-	if (!nourls) {
+-		// pull out URLs and flag them specially
+-		return str.split(URL_REGEXP).map(function(s) {
+-			return texEscape(s, "nourls");
+-		}).map(function(s, i) {
+-			/* jshint bitwise: false */
+-			return (s && (i&1)) ? ('\\nolinkurl{' + s + '}') : s;
+-		}).join('');
+-	}
++var texCharEscape = function(str) {
+ 	// protect TeX special characters
+ 	// (See `class CharMaps` in http://sourceforge.net/p/docutils/code/HEAD/tree/trunk/docutils/docutils/writers/latex2e/__init__.py )
+ 	str = str.replace(/[#$&_%{}~^\\\[\]]/g, function(c) {
+@@ -202,6 +197,58 @@ var texEscape = function(str, nourls) {
+ 		default: return '\\' + c;
+ 		}
+ 	});
++	return str;
++}
++
++var dmathEscape = function(str) {
++// 	str = '\\begin{equation}' + str;
++// 	var re = /type=[\"\']?(\w*?)[\"\']?>/; 
++	
++	// Extract tag
++	var re = /\s?type=[\"\']?(\w*?)[\"\']?\s?>([\s\S]*)<\s?\/\s?dmath\s?>/; 
++	var tag = re.exec(str);
++	if (tag) {
++		var subst = '\\begin{$1}\n$2\n\\end{$1}';  
++		str = str.replace(re, subst);
++// 		console.warn(tag);
++		if (tag[1] == "split") {
++			str = "\\begin{equation}"+str+"\\end{equation}";
++		}
++	} else {
++		str = str.replace(/\s?>/, ''); // Strip first >, remaining from the open <dmath> tag
++		str = '\\begin{equation*}' + str;
++		str = str.replace('</dmath>', '\\end{equation*}');
++	}
++	return str;
++}
++
++// Convert plain text (with HTML whitespace semantics) to an appropriately
++// escaped string for TeX to process.
++var texEscape = function(str, nourls) {
++	if (!nourls) {
++		// pull out URLs and flag them specially
++		return str.split(URL_REGEXP).map(function(s) {
++			return texEscape(s, "nourls");
++		}).map(function(s, i) {
++			/* jshint bitwise: false */
++			return (s && (i&1)) ? ('\\nolinkurl{' + s + '}') : s;
++		}).join('');
++	}
++
++	// HACK WikiFM - Implement <dmath>
++	// Prependi uno spazio all'inizio
++	var arr = str.split('<dmath');
++	for (var i = 0; i < arr.length; i++) {
++		if (!i%2) { // even number
++			arr[i] = texCharEscape(arr[i]);
++		} else {
++			arr[i] = dmathEscape(arr[i]);
++		}
++	}
++	str = arr.join('\n');
++	console.warn(str);
++// 	str = texCharEscape(str);
++	
+ 	// compress multiple newlines (and use unix-style newlines exclusively)
+ 	str = str.replace(/\r\n?/g, '\n').replace(/\n\n+/g, '\n');
+ 	// trim leading and trailing newlines for consistent output.
+@@ -226,6 +273,11 @@ var texEscape = function(str, nourls) {
+ 	// differentiate minus sign from hyphen
+ 	//str = str.replace(/(^|\W)(-[0-9.]+)/g, '$1$$$2$$');
+ 	str = str.replace(/(^|\W)-([0-9.]+)/g, '$1$$-$$$2');
++	
++	// HACK WikiFM Implement <dmath>
++// 	str = str.replace(/<dmath\s*>(.*)<\/dmath>/g, '\\begin{equation*}$1\\end{equation*}');
++// 	str = str.replace(/<dmath\s*>(.*)<\/dmath>/g, '$$ $1 $$');
++	
+ 	return str;
+ };
+ 
+@@ -688,6 +740,7 @@ Visitor.prototype.visit = function(node) {
+ 	var name = node.nodeName, type = node.nodeType;
+ 	switch(type) {
+ 	case node.ELEMENT_NODE:
++		console.warn(name);
+ 		if (isHidden(node)) {
+ 			return;
+ 		}
+@@ -709,6 +762,7 @@ Visitor.prototype.visit = function(node) {
+ 		// use typeof property if possible
+ 		if (node.hasAttribute('typeof')) {
+ 			var typeo = node.getAttribute('typeof');
++			console.warn(typeo); //WikiFM
+ 			if (this['visitTYPEOF=' + typeo]) {
+ 				return this['visitTYPEOF=' + typeo].apply(this, arguments);
+ 			}
+@@ -1330,7 +1384,6 @@ Visitor.prototype.visitMultipleImage = function(node) {
+ 	}
+ };
+ 
+-
+ // hack to support triple image template
+ Visitor.prototype.visitDIV = function(node) {
+ 	if (isMultipleImageTemplate(node)) {
