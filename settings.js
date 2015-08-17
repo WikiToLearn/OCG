@@ -1,11 +1,11 @@
 "use strict";
 
 exports.setup = function( parsoidConfig ) {
-        parsoidConfig.setInterwiki( 'dewikifm', 'http://de.wikifm.org/api.php' );
-        parsoidConfig.setInterwiki( 'enwikifm', 'http://en.wikifm.org/api.php' );
-        parsoidConfig.setInterwiki( 'eswikifm', 'http://es.wikifm.org/api.php' );
-        parsoidConfig.setInterwiki( 'frwikifm', 'http://fr.wikifm.org/api.php' );
-        parsoidConfig.setInterwiki( 'itwikifm', 'http://it.wikifm.org/api.php' );
+        parsoidConfig.setInterwiki( 'dewikitolearn', 'http://de.wikitolearn.org/api.php' );
+        parsoidConfig.setInterwiki( 'enwikitolearn', 'http://en.wikitolearn.org/api.php' );
+        parsoidConfig.setInterwiki( 'eswikitolearn', 'http://es.wikitolearn.org/api.php' );
+        parsoidConfig.setInterwiki( 'frwikitolearn', 'http://fr.wikitolearn.org/api.php' );
+        parsoidConfig.setInterwiki( 'itwikitolearn', 'http://it.wikitolearn.org/api.php' );
         parsoidConfig.debug = true;
         parsoidConfig.useSelser = true;
         parsoidConfig.allowCORS = '*';
