@@ -72,3 +72,5 @@ cd mw-ocg-service
 patch < /root/wikifm-ocg.path
 
 chmod +x /root/run.sh
+
+rm -f /var/cache/apt/archives/*deb
