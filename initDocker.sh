@@ -68,7 +68,7 @@ for f in mw-ocg-service mw-ocg-bundler mw-ocg-latexer mw-ocg-texter ; do
  npm install
  cd ..
 done
-cd mw-ocg-service
+cd mw-ocg-latexer
 patch -p1 < /root/wikifm-ocg.path
 
 chmod +x /root/run.sh
