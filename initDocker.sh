@@ -69,7 +69,7 @@ for f in mw-ocg-service mw-ocg-bundler mw-ocg-latexer mw-ocg-texter ; do
  cd ..
 done
 cd mw-ocg-service
-patch < /root/wikifm-ocg.path
+patch -p1 < /root/wikifm-ocg.path
 
 chmod +x /root/run.sh
 
