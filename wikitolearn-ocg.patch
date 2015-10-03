@@ -1,8 +1,13 @@
 diff --git a/lib/index.js b/lib/index.js
-index 28a4a6a..7127c6e 100644
+index 262d831..8278e1b 100644
 --- a/lib/index.js
 +++ b/lib/index.js
-@@ -87,6 +87,7 @@ var STD_HEADER = [
+@@ -83,10 +83,11 @@ var STD_HEADER = [
+ 	"%!TEX TS-program = xelatex",
+ 	"%!TEX encoding = UTF-8 Unicode",
+ 	"",
+-	"\\documentclass[10pt,twocolumn,twoside,fleqn]{article}",
++	"\\documentclass[10pt,onecolumn,twoside,fleqn]{article}",
  	"\\pagestyle{headings}",
  	"\\usepackage{fontspec, xunicode, polyglossia, graphicx, xltxtra}",
  	"\\usepackage{amsmath,amsthm,amstext,amssymb}",
@@ -51,32 +56,10 @@ index 28a4a6a..7127c6e 100644
  	// protect TeX special characters
  	// (See `class CharMaps` in http://sourceforge.net/p/docutils/code/HEAD/tree/trunk/docutils/docutils/writers/latex2e/__init__.py )
  	str = str.replace(/[#$&_%{}~^\\\[\]]/g, function(c) {
-@@ -202,6 +197,58 @@ var texEscape = function(str, nourls) {
+@@ -202,6 +197,24 @@ var texEscape = function(str, nourls) {
  		default: return '\\' + c;
  		}
  	});
-+	return str;
-+}
-+
-+var dmathEscape = function(str) {
-+// 	str = '\\begin{equation}' + str;
-+// 	var re = /type=[\"\']?(\w*?)[\"\']?>/; 
-+	
-+	// Extract tag
-+	var re = /\s?type=[\"\']?(\w*?)[\"\']?\s?>([\s\S]*)<\s?\/\s?dmath\s?>/; 
-+	var tag = re.exec(str);
-+	if (tag) {
-+		var subst = '\\begin{$1}\n$2\n\\end{$1}';  
-+		str = str.replace(re, subst);
-+// 		console.warn(tag);
-+		if (tag[1] == "split") {
-+			str = "\\begin{equation}"+str+"\\end{equation}";
-+		}
-+	} else {
-+		str = str.replace(/\s?>/, ''); // Strip first >, remaining from the open <dmath> tag
-+		str = '\\begin{equation*}' + str;
-+		str = str.replace('</dmath>', '\\end{equation*}');
-+	}
 +	return str;
 +}
 +
@@ -92,37 +75,21 @@ index 28a4a6a..7127c6e 100644
 +			return (s && (i&1)) ? ('\\nolinkurl{' + s + '}') : s;
 +		}).join('');
 +	}
-+
-+	// HACK WikiFM - Implement <dmath>
-+	// Prependi uno spazio all'inizio
-+	var arr = str.split('<dmath');
-+	for (var i = 0; i < arr.length; i++) {
-+		if (!i%2) { // even number
-+			arr[i] = texCharEscape(arr[i]);
-+		} else {
-+			arr[i] = dmathEscape(arr[i]);
-+		}
-+	}
-+	str = arr.join('\n');
-+	console.warn(str);
-+// 	str = texCharEscape(str);
++	//char escape
++ 	str = texCharEscape(str);
 +	
  	// compress multiple newlines (and use unix-style newlines exclusively)
  	str = str.replace(/\r\n?/g, '\n').replace(/\n\n+/g, '\n');
  	// trim leading and trailing newlines for consistent output.
-@@ -226,6 +273,11 @@ var texEscape = function(str, nourls) {
+@@ -226,6 +239,7 @@ var texEscape = function(str, nourls) {
  	// differentiate minus sign from hyphen
  	//str = str.replace(/(^|\W)(-[0-9.]+)/g, '$1$$$2$$');
  	str = str.replace(/(^|\W)-([0-9.]+)/g, '$1$$-$$$2');
 +	
-+	// HACK WikiFM Implement <dmath>
-+// 	str = str.replace(/<dmath\s*>(.*)<\/dmath>/g, '\\begin{equation*}$1\\end{equation*}');
-+// 	str = str.replace(/<dmath\s*>(.*)<\/dmath>/g, '$$ $1 $$');
-+	
  	return str;
  };
  
-@@ -688,6 +740,7 @@ Visitor.prototype.visit = function(node) {
+@@ -688,6 +702,7 @@ Visitor.prototype.visit = function(node) {
  	var name = node.nodeName, type = node.nodeType;
  	switch(type) {
  	case node.ELEMENT_NODE:
@@ -130,7 +97,7 @@ index 28a4a6a..7127c6e 100644
  		if (isHidden(node)) {
  			return;
  		}
-@@ -709,6 +762,7 @@ Visitor.prototype.visit = function(node) {
+@@ -709,6 +724,7 @@ Visitor.prototype.visit = function(node) {
  		// use typeof property if possible
  		if (node.hasAttribute('typeof')) {
  			var typeo = node.getAttribute('typeof');
@@ -138,7 +105,34 @@ index 28a4a6a..7127c6e 100644
  			if (this['visitTYPEOF=' + typeo]) {
  				return this['visitTYPEOF=' + typeo].apply(this, arguments);
  			}
-@@ -1330,7 +1384,6 @@ Visitor.prototype.visitMultipleImage = function(node) {
+@@ -1255,6 +1271,26 @@ Visitor.prototype['visitTYPEOF=mw:Extension/math'] = function(node, display) {
+ 	}
+ };
+ 
++//hack for dmath tag
++Visitor.prototype['visitTYPEOF=mw:Extension/dmath'] = function(node, display) {
++	this.format.envBreak();
++	var math = JSON.parse(node.getAttribute('data-mw')).body.extsrc;
++	// validate/translate using texvc
++	var mr = texvcjs.check(math);
++	if (mr.status !== '+') {
++		//console.warn("Broken math markup:", math, mr.details||'');
++		return; // broken math markup, suppress it
++	}
++	if (mr.cancel_required || mr.euro_required || mr.teubner_required) {
++		//console.warn("Math markup requires additional packages");
++		return;
++	}
++	
++	this.format.writeDecorated('$$');
++	this.format.writeDecorated(mr.output);
++	this.format.writeDecorated('$$')
++};
++
+ Visitor.prototype['visitLANG='] = function(node) {
+ 	var r;
+ 	var savedLanguage = this.currentLanguage;
+@@ -1330,7 +1366,6 @@ Visitor.prototype.visitMultipleImage = function(node) {
  	}
  };
  
