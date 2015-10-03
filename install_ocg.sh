@@ -16,4 +16,4 @@ for f in mw-ocg-service mw-ocg-bundler mw-ocg-latexer mw-ocg-texter ; do
  cd ..
 done
 cd mw-ocg-latexer
-patch -p1 < /root/wikifm-ocg.path
+patch -p1 < /root/wikitolearn-ocg.patch

@@ -7,7 +7,7 @@ RUN apt-get -y install zip unzip nano apt-utils curl rsync git && rm -f /var/cac
 
 ADD ./sources.list /etc/apt/
 
-ADD ./wikifm-ocg.path /root/
+ADD ./wikitolearn-ocg.patch /root/
 ADD ./run.sh /root/
 
 RUN gpg --keyserver keys.gnupg.net --recv-keys 5C927F7C
