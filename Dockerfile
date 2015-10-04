@@ -52,13 +52,12 @@ RUN apt-get clean
 
 RUN useradd -r -d /var/lib/ocg ocg
 RUN mkdir /var/lib/ocg
+RUN npm install es6-shim prfun  commander domino linewrap tmp sqlite3 -g
 
 ADD ./install_ocg.sh /root/
 RUN /bin/chmod +x /root/install_ocg.sh
-RUN /root/install_ocg.sh
+RUN /root/install_ocg.sh 0.1
 RUN rm /root/install_ocg.sh
-
-RUN npm install es6-shim prfun  commander domino linewrap tmp sqlite3 -g
 
 RUN chmod +x /root/run.sh
 
