@@ -7,9 +7,6 @@ RUN apt-get -y install zip unzip nano apt-utils curl rsync git && rm -f /var/cac
 
 ADD ./sources.list /etc/apt/
 
-ADD ./wikitolearn-ocg.patch /root/
-ADD ./run.sh /root/
-
 RUN gpg --keyserver keys.gnupg.net --recv-keys 5C927F7C
 RUN gpg -a --export 5C927F7C | apt-key add -
 RUN echo "deb [arch=amd64] http://parsoid.wmflabs.org:8080/deb wmf-production main" > /etc/apt/sources.list.d/parsoid.wmflabs.org.list
@@ -55,14 +52,15 @@ RUN mkdir /var/lib/ocg
 RUN npm install es6-shim prfun  commander domino linewrap tmp sqlite3 -g
 
 ADD ./install_ocg.sh /root/
-RUN /bin/chmod +x /root/install_ocg.sh
-RUN /root/install_ocg.sh 0.1
-RUN rm /root/install_ocg.sh
 
-RUN chmod +x /root/run.sh
+RUN /bin/chmod +x /root/install_ocg.sh
+RUN /root/install_ocg.sh
+RUN rm /root/install_ocg.sh
 
 ADD ./localsettings.js /var/lib/ocg/mw-ocg-service/
 ADD ./settings.js  /etc/mediawiki/parsoid/
 
+ADD ./run.sh /root/
+RUN chmod +x /root/run.sh
 
 CMD ["/root/run.sh"]
