@@ -3,7 +3,7 @@ cd /var/lib/ocg
 
 git clone https://github.com/WikiToLearn/mw-ocg-full.git --recursive .
 
-git checkout 0.4
+git checkout 0.4.1
 
 cd /var/lib/ocg/mw-ocg-service
 npm install
