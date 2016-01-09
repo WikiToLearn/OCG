@@ -16,7 +16,7 @@ RUN git clone https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Collection/O
 RUN cd mw-ocg-texter && npm install
 
 WORKDIR /var/lib/ocg/
-RUN git clone https://github.com/WikiToLearn/mw-ocg-latexer.git mw-ocg-latexer && cd mw-ocg-latexer && git checkout 0.5.2
+RUN git clone https://github.com/WikiToLearn/mw-ocg-latexer.git mw-ocg-latexer && cd mw-ocg-latexer && git checkout 0.6
 RUN cd mw-ocg-latexer && npm install
 
 ADD ./localsettings.js /var/lib/ocg/mw-ocg-service/
