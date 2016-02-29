@@ -1,0 +1,12 @@
+[submodule "mw-ocg-bundler"]
+	path = mw-ocg-bundler
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Collection/OfflineContentGenerator/bundler
+[submodule "mw-ocg-latexer"]
+	path = mw-ocg-latexer
+	url = https://github.com/WikiToLearn/mw-ocg-latexer.git
+[submodule "mw-ocg-service"]
+	path = mw-ocg-service
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Collection/OfflineContentGenerator
+[submodule "mw-ocg-texter"]
+	path = mw-ocg-texter
+	url = https://gerrit.wikimedia.org/r/p/mediawiki/extensions/Collection/OfflineContentGenerator/text_renderer
