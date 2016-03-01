@@ -18,7 +18,7 @@ if [[ "$langs" != "" ]] ; then
  } > /etc/mediawiki/parsoid/settings.js
 fi
 
-/etc/init.d/parsoid start
+#/etc/init.d/parsoid start
 /etc/init.d/redis-server start
 cd /var/lib/ocg/mw-ocg-service/
-./mw-ocg-service.js -c localsettings.js
+exec ./mw-ocg-service.js -c localsettings.js
