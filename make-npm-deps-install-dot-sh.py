@@ -7,10 +7,10 @@ npm_install_cmd="npm install -g "
 
 
 if not os.path.exists(out_file):
-    print "You must have the {} file".format(out_file)
+    print( "You must have the {} file".format(out_file))
 else:
     for file in ['mw-ocg-bundler/package.json', 'mw-ocg-latexer/package.json', 'mw-ocg-service/package.json', 'mw-ocg-texter/package.json']:
-        print "=> ",file
+        print ("=> ",file)
         with open(file) as data_file:
             data = json.load(data_file)
             for v in (data['dependencies']):
@@ -22,7 +22,7 @@ else:
         if "mw-ocg-" not in npm_dep:
             npm_install_cmd = npm_install_cmd + npm_dep + " "
 
-    print "Write to {}".format(out_file)
+    print ("Write to {}".format(out_file))
     target = open(out_file, 'w')
     target.write("#!/bin/bash\n")
     target.write(npm_install_cmd+"\n")
