@@ -7,6 +7,9 @@ if [[ ! -d $(pwd)/test/ ]] ; then
  exit 1
 fi
 
+MY_UID=$(id -u)
+MY_GID=$(id -g)
+
 for FULLNAME in $(pwd)"/test/zip/"* ; do
  FILE_NAME=$(basename $FULLNAME)
  PAGENAME=${FILE_NAME:0:-4}
@@ -14,6 +17,10 @@ for FULLNAME in $(pwd)"/test/zip/"* ; do
  echo $PAGENAME
  {
   docker run -v $(pwd)"/test/zip/":/test/zip/ -v $(pwd)"/test/pdf/":/test/pdf/ --rm -ti wikitolearn/ocg:new \
-   /var/lib/ocg/mw-ocg-latexer/bin/mw-ocg-latexer /test/zip/$PAGENAME.zip -o /test/pdf/$PAGENAME.pdf
+   /var/lib/ocg/mw-ocg-latexer/bin/mw-ocg-latexer /test/zip/$PAGENAME.zip -1 -o /test/pdf/$PAGENAME.pdf
  } &> $LOG_FILE
+
+docker run -v $(pwd)"/test/zip/":/test/zip/ -v $(pwd)"/test/pdf/":/test/pdf/ --rm -ti wikitolearn/ocg:new \
+ chown $MY_UID:$MY_GID /test/pdf/$PAGENAME.pdf
+
 done
