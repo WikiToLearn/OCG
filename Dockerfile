@@ -1,4 +1,4 @@
-FROM wikitolearn/ocg-base:0.1
+FROM wikitolearn/ocg-base:0.2
 MAINTAINER valsdav sysadmin@wikitolearn.org
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN true
@@ -27,7 +27,6 @@ RUN npm install
 
 
 ADD ./localsettings.js /var/lib/ocg/mw-ocg-service/
-ADD ./settings.js  /etc/mediawiki/parsoid/
 
 ADD ./run.sh /root/
 RUN chmod +x /root/run.sh
