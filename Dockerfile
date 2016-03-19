@@ -1,9 +1,9 @@
-FROM wikitolearn/ocg-base:0.3.14
+FROM wikitolearn/ocg-base:0.3.15
 MAINTAINER valsdav sysadmin@wikitolearn.org
 ENV DEBIAN_FRONTEND noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN true
 
-# running de dep resolver script
+# Running dep-resolver script
 ADD ./npm-deps-install.sh /npm-deps-install.sh
 RUN chmod +x /npm-deps-install.sh
 RUN ./npm-deps-install.sh
@@ -23,8 +23,6 @@ RUN npm install
 ADD mw-ocg-latexer/ /var/lib/ocg/mw-ocg-latexer/
 WORKDIR /var/lib/ocg/mw-ocg-latexer/
 RUN npm install
-
-
 
 ADD ./localsettings.js /var/lib/ocg/mw-ocg-service/
 

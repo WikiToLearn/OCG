@@ -25,5 +25,6 @@ else:
     print ("Write to {}".format(out_file))
     target = open(out_file, 'w')
     target.write("#!/bin/bash\n")
+    target.write("npm update\n")
     target.write(npm_install_cmd+"\n")
     target.close()
