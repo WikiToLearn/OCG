@@ -25,7 +25,7 @@ for FULLNAME in "$(pwd)/test/zip/"* ; do
         -v "$(pwd)/mw-ocg-latexer/lib":/var/lib/ocg/mw-ocg-latexer/lib \
         -v "$(pwd)/mw-ocg-latexer/tex":/var/lib/ocg/mw-ocg-latexer/tex \
         -v "$(pwd)/mw-ocg-latexer/package.json":/var/lib/ocg/mw-ocg-latexer/package.json \
-        --rm -ti wikitolearn/ocg:new  \
+        --rm -ti wikitolearn/ocg:$(cat new_docker_version)  \
         /var/lib/ocg/mw-ocg-latexer/bin/mw-ocg-latexer \
         /test/zip/$PAGENAME.zip -1 \
         -o /test/pdf/$PAGENAME.pdf | tee $LOG_FILE

@@ -16,11 +16,11 @@ for FULLNAME in $(pwd)"/test/zip/"* ; do
  LOG_FILE=$(pwd)"/test/logs/"$PAGENAME".log"
  echo $PAGENAME
  {
-  docker run -v $(pwd)"/test/zip/":/test/zip/ -v $(pwd)"/test/pdf/":/test/pdf/ --rm -ti wikitolearn/ocg:new \
+  docker run -v $(pwd)"/test/zip/":/test/zip/ -v $(pwd)"/test/pdf/":/test/pdf/ --rm -ti wikitolearn/ocg:$(cat new_docker_version) \
    /var/lib/ocg/mw-ocg-latexer/bin/mw-ocg-latexer /test/zip/$PAGENAME.zip -1 -o /test/pdf/$PAGENAME.pdf
  } &> $LOG_FILE
 
-docker run -v $(pwd)"/test/zip/":/test/zip/ -v $(pwd)"/test/pdf/":/test/pdf/ --rm -ti wikitolearn/ocg:new \
+docker run -v $(pwd)"/test/zip/":/test/zip/ -v $(pwd)"/test/pdf/":/test/pdf/ --rm -ti wikitolearn/ocg:$(cat new_docker_version) \
  chown $MY_UID:$MY_GID /test/pdf/$PAGENAME.pdf
 
 done
