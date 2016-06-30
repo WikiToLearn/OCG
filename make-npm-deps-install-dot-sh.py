@@ -1,10 +1,11 @@
+#!/usr/bin/env python2
 import json
 import os.path
 
 out_file="npm-deps-install.sh"
 npm_deps={}
 npm_install_cmd="npm install -g "
-
+npm_install_cmd="/docker-npm-install.sh "
 
 if not os.path.exists(out_file):
     print( "You must have the {} file".format(out_file))
