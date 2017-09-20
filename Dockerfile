@@ -1,4 +1,4 @@
-FROM wikitolearn/ocg-base:0.4.1
+FROM wikitolearn/ocg-base:0.5.0
 MAINTAINER valsdav sysadmin@wikitolearn.org
 
 ADD ./docker-npm-install.sh /docker-npm-install.sh
@@ -20,18 +20,19 @@ RUN /docker-npm-install.sh
 
 # Running dep-resolver script
 # START_DEP_RESOLVER
-RUN npm install -g commander@~2.8.1
-RUN npm install -g npm-travis@~1.0.0
-RUN npm install -g linewrap@~0.2.1
-RUN npm install -g jshint@~2.8.0
-RUN npm install -g domino@~1.0.19
-RUN npm install -g mocha@~2.3.3
-RUN npm install -g prfun@~2.1.1
-RUN npm install -g readable-stream@~1.0.33
-RUN npm install -g core-js@~0.9.18
-RUN npm install -g tmp@~0.0.27
-RUN npm install -g jscs@~2.5.0
+RUN npm install -g jscs@~2.11.0
 RUN npm install -g sqlite3@~3.1.0
+RUN npm install -g jshint@~2.9.2
+RUN npm install -g domino@~1.0.24
+RUN npm install -g mocha@~2.4.5
+RUN npm install -g core-js@~2.3.0
+RUN npm install -g linewrap@~0.2.1
+RUN npm install -g prfun@~2.1.4
+RUN npm install -g tmp@~0.0.28
+RUN npm install -g npm-travis@~1.0.2
+RUN npm install -g readable-stream@~1.0.33
+RUN npm install -g babybird@~0.0.1
+RUN npm install -g commander@~2.9.0
 # END_DEP_RESOLVER
 
 ADD mw-ocg-latexer/ /var/lib/ocg/mw-ocg-latexer/
@@ -44,4 +45,3 @@ ADD ./run.sh /root/
 RUN chmod +x /root/run.sh
 
 CMD ["/root/run.sh"]
-
